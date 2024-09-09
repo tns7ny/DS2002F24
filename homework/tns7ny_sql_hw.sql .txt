@@ -1,0 +1,174 @@
+/*
+Katie Shaughnessy
+Professor Williamson
+08 September 2024
+DS 2002-001
+*/
+
+
+/*
+PART 1
+*/
+
+
+USE world;
+SELECT name FROM country WHERE continent = 'South America';
+
+
+USE world;
+SELECT name, population FROM country WHERE name = 'Germany';
+
+
+USE world;
+SELECT name FROM city WHERE countrycode = "JPN”;
+
+
+USE world;
+SELECT name, population FROM country WHERE continent = 'Africa' ORDER BY population DESC LIMIT 3;
+
+
+USE world;
+SELECT name, LifeExpectancy FROM country WHERE population BETWEEN 1000000 AND 5000000;
+
+
+USE world;
+SELECT country.Name FROM country
+JOIN countrylanguage ON country.Code = countrylanguage.CountryCode
+WHERE countrylanguage.Language = 'French' AND countrylanguage.IsOfficial = 'T';
+
+ 
+USE Chinook_AutoIncrement;
+SELECT Album.Title FROM Album
+JOIN Artist ON Album.ArtistId = Artist.ArtistId
+WHERE Artist.Name = 'AC/DC';
+
+
+USE Chinook_AutoIncrement;
+SELECT FirstName, LastName, Email FROM Customer WHERE Country = 'Brazil';
+
+
+USE Chinook_AutoIncrement;
+SELECT Name FROM Playlist;
+
+
+USE Chinook_AutoIncrement;
+SELECT COUNT(*) AS RockTrackCount
+FROM Track
+JOIN Genre ON Track.GenreId = Genre.GenreId
+WHERE Genre.Name = 'Rock';
+
+
+USE Chinook_AutoIncrement;
+SELECT FirstName, LastName FROM Employee 
+WHERE ReportsTo = (SELECT EmployeeId FROM Employee WHERE FirstName = 'Nancy' AND LastName = 'Edwards');
+
+
+USE Chinook_AutoIncrement;
+SELECT Customer.FirstName, Customer.LastName, SUM(Invoice.Total) AS TotalSales
+FROM Customer JOIN Invoice ON Customer.CustomerId = Invoice.CustomerId
+GROUP BY Customer.CustomerId, Customer.FirstName, Customer.LastName;
+
+
+
+/*
+PART 2
+*/
+
+
+USE tns7ny;
+
+CREATE TABLE Gymnasts (
+    GymnastId INT PRIMARY KEY,
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
+    Country VARCHAR(100) NOT NULL 
+);
+
+CREATE TABLE Events (
+    EventId INT PRIMARY KEY,
+    EventName VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Scores (
+    ScoreId INT PRIMARY KEY,
+    GymnastId INT,
+    EventId INT,
+    Score DECIMAL(5, 2) NOT NULL,
+    FOREIGN KEY (GymnastId) REFERENCES Gymnasts(GymnastId),
+    FOREIGN KEY (EventId) REFERENCES Events(EventId)
+);
+
+
+
+
+USE tns7ny;
+
+INSERT INTO Gymnasts (GymnastId, FirstName, LastName, Country) 
+VALUES 
+(1, 'Stephen', 'Nedoroscik', 'USA'),
+(2, 'Marian', 'Dragulescu', 'Romania'),
+(3, 'Fredrick', 'Richard', 'USA'),
+(4, 'Kohei', 'Uchimura', 'Japan'),
+(5, 'Max', 'Whitlock', 'UK'),
+(6, 'Zachary', 'Clay', 'Canada');
+
+INSERT INTO Events (EventId, EventName) 
+VALUES 
+(1, 'Vault'),
+(2, 'Floor Exercise'),
+(3, 'Rings'),
+(4, 'Parallel Bars'),
+(5, 'High Bar'),
+(6, 'Pommel Horse');
+
+INSERT INTO Scores (ScoreId, GymnastId, EventId, Score)
+VALUES 
+(1, 1, 1, 15.50),
+(2, 2, 2, 15.00),
+(3, 3, 3, 14.80),
+(4, 4, 4, 15.90),
+(5, 5, 5, 15.20),
+(6, 6, 6, 13.75);
+
+
+
+/*
+(Select the gymnast that competed on high bar)
+*/
+
+USE tns7ny;
+SELECT Gymnasts.FirstName, Gymnasts.LastName 
+FROM Gymnasts 
+JOIN Scores ON Gymnasts.GymnastId = Scores.GymnastId 
+JOIN Events ON Scores.EventId = Events.EventId 
+WHERE Events.EventName = 'High Bar';
+
+
+/*
+(Select the name and total scores of the gymnasts)
+*/
+
+USE tns7ny;
+SELECT Gymnasts.FirstName, Gymnasts.LastName, SUM(Scores.Score) AS TotalScore
+FROM Scores 
+JOIN Gymnasts ON Scores.GymnastId = Gymnasts.GymnastId
+GROUP BY Gymnasts.FirstName, Gymnasts.LastName;
+
+
+/*
+(Select the gymnast and the events that they scored a 15.0 or higher on)
+*/
+
+USE tns7ny;
+SELECT Gymnasts.FirstName, Gymnasts.LastName, Events.EventName, Scores.Score
+FROM Scores
+JOIN Gymnasts ON Scores.GymnastId = Gymnasts.GymnastId
+JOIN Events ON Scores.EventId = Events.EventId
+WHERE Scores.Score >= 15.00;
+
+
+
+
+
+
+
